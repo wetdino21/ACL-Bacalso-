@@ -1,0 +1,97 @@
+
+----SCRIPT----
+
+(PC Configuration)
+[N.A: 192.168.0.0]
+S.M: 255.255.255.0
+D.G: 192.168.0.1
+PC1: 192.168.0.2
+PC2: 192.168.0.3
+PC3: 192.168.0.4
+PC4: 192.168.0.5
+
+[N.A: 192.168.3.0]
+S.M: 255.255.255.0
+D.G: 192.168.3.1
+PC5: 192.168.3.2
+PC6: 192.168.3.3
+
+[N.A: 192.168.4.0]
+S.M: 255.255.255.0
+D.G: 192.168.4.1
+PC7: 192.168.4.2
+PC8: 192.168.4.3
+
+
+(Router & router rip configuration)
+
+R1:
+enable
+config t
+int fa0/0
+ip add 192.168.0.1 255.255.255.0
+no shutdown
+do wr
+int s0/1/0
+ip add 192.168.1.1 255.255.255.0
+no shutdown
+do wr
+router rip
+network 192.168.0.0
+network 192.168.1.0
+
+
+R2:
+enable
+config t
+int fa0/0
+ip add 192.168.1.2 255.255.255.0
+no shutdown
+do wr
+int s0/1/0
+ip add 192.168.3.1 255.255.255.0
+no shutdown
+do wr
+int s0/1/1
+ip add 192.168.2.1 255.255.255.0
+no shutdown
+do wr
+router rip
+network 192.168.1.0
+network 192.168.2.0
+network 192.168.3.0
+
+R3:
+enable
+config t
+int fa0/0
+ip add 192.168.2.2 255.255.255.0
+no shutdown
+do wr
+int s0/1/0
+ip add 192.168.4.1 255.255.255.0
+no shutdown
+do wr
+router rip
+network 192.168.2.0
+network 192.168.4.0
+
+
+
+(ACL on Router config)
+
+R2:
+access-list 1 permit host 192.168.0.4
+access-list 1 permit host 192.168.0.5
+access-list 1 deny 192.168.4.0 0.0.0.255
+access-list 1 deny any
+int fa0/0
+ip access-group 1 out
+
+R3:
+access-list 1 permit host 192.168.0.2
+access-list 1 permit host 192.168.0.3
+access-list 1 deny 192.168.3.0 0.0.0.255
+access-list 1 deny any
+int fa0/0
+ip access-group 1 out
